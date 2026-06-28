@@ -5,11 +5,14 @@ import type {
   ConversationMessagesResponse,
   ConversationsResponse,
   FriendRequestsResponse,
+  FriendSuggestionsResponse,
   FriendsResponse,
   FriendshipStatusResponse,
   Message,
   ProfileResponse,
+  PublicProfileResponse,
   SendFriendRequestResponse,
+  UpdateProfileInput,
   UserSearchResult,
 } from "./types";
 
@@ -170,6 +173,12 @@ export const api = {
   listFriends: (q?: string, signal?: AbortSignal) =>
     request<FriendsResponse>("/friends", { query: { q }, signal }),
 
+  listFriendSuggestions: (limit?: number, signal?: AbortSignal) =>
+    request<FriendSuggestionsResponse>("/suggestions/friends", {
+      query: { limit },
+      signal,
+    }),
+
   listIncomingRequests: () =>
     request<FriendRequestsResponse>("/friends/requests/incoming"),
 
@@ -213,6 +222,14 @@ export const api = {
 
   /* ---- Persona profile ---- */
   getMyProfile: () => request<ProfileResponse>("/profile/me"),
+
+  // Unified account + persona update. Send only the fields that changed.
+  updateMyProfile: (input: UpdateProfileInput) =>
+    request<ProfileResponse>("/profile/me", { method: "PUT", body: input }),
+
+  // Public profile of another user. 404 when the target persona isn't READY.
+  getPublicProfile: (userId: string, signal?: AbortSignal) =>
+    request<PublicProfileResponse>(`/profile/${userId}`, { signal }),
 
   submitProfileStory: (story: string) =>
     request<ProfileResponse>("/profile/story", {

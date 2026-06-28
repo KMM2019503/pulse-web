@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Check, X } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,16 @@ function Row({
         className="size-11"
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium">{user?.userName ?? "Unknown"}</p>
+        {user?.id ? (
+          <Link
+            href={`/profile/${user.id}`}
+            className="block truncate font-medium hover:underline focus-visible:underline focus-visible:outline-none"
+          >
+            {user.userName}
+          </Link>
+        ) : (
+          <p className="truncate font-medium">Unknown</p>
+        )}
         <p className="truncate text-xs text-muted-foreground">
           {user?.userUniqueID ? `${user.userUniqueID} · ` : ""}
           {user?.email}

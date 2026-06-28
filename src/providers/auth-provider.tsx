@@ -20,6 +20,8 @@ interface AuthContextValue {
     dob?: string;
   }) => Promise<void>;
   logout: () => Promise<void>;
+  /** Patch the cached user (e.g. after editing the profile). */
+  setUser: (user: User) => void;
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
@@ -135,8 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login,
       signup,
       logout,
+      setUser: persistUser,
     }),
-    [user, status, onlineUserIds, login, signup, logout],
+    [user, status, onlineUserIds, login, signup, logout, persistUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

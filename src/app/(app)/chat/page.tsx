@@ -3,9 +3,10 @@
 import { ConversationList } from "@/components/chat/conversation-list";
 import { EmptyState } from "@/components/chat/empty-state";
 import { ComposeIconButton } from "@/components/chat/compose-button";
+import { SidebarUserButton } from "@/components/chat/sidebar-user-button";
 import { NearbyNavButton } from "@/components/nearby/nearby-nav-button";
+import { FriendsNavButton } from "@/components/friends/friends-nav-button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { BrandWordmark } from "@/components/brand";
 
 export default function ChatIndexPage() {
   return (
@@ -15,9 +16,10 @@ export default function ChatIndexPage() {
 
       {/* Mobile: this route is the conversation list. */}
       <div className="flex h-dvh flex-col md:hidden">
-        <header className="flex items-center justify-between px-4 py-3.5">
-          <BrandWordmark />
+        <header className="flex items-center justify-between gap-2 px-3 py-3">
+          <SidebarUserButton className="min-w-0 flex-1" />
           <div className="flex items-center gap-0.5">
+            <FriendsNavButton />
             <NearbyNavButton />
             <ComposeIconButton />
             <ThemeToggle />

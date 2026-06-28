@@ -2,34 +2,50 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowLeft, RefreshCw, Search, UserPlus, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  RefreshCw,
+  Search,
+  Sparkles,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
+  useFriendSuggestions,
   useFriends,
   useIncomingRequests,
   useOutgoingRequests,
 } from "@/hooks/use-friends";
 import { FriendItem } from "./friend-item";
+import { FriendSuggestionItem } from "./friend-suggestion-item";
 import { IncomingRequestItem, OutgoingRequestItem } from "./request-item";
 import { cn } from "@/lib/utils";
 
-type Tab = "friends" | "requests";
+type Tab = "friends" | "suggestions" | "requests";
 
 export function FriendsScreen() {
   const [tab, setTab] = React.useState<Tab>("friends");
   const [search, setSearch] = React.useState("");
 
   const friends = useFriends(tab === "friends" ? search : "");
+  const suggestions = useFriendSuggestions(8, tab === "suggestions");
   const incoming = useIncomingRequests();
   const outgoing = useOutgoingRequests();
 
   const pendingCount = incoming.data?.length ?? 0;
+  const suggestionCount = suggestions.data?.length ?? 0;
 
   const refresh = () => {
-    if (tab === "friends") void friends.refetch();
+    if (tab === "friends") {
+      void friends.refetch();
+    }
+    else if (tab === "suggestions") {
+      void suggestions.refetch();
+    }
     else {
       void incoming.refetch();
       void outgoing.refetch();
@@ -39,7 +55,9 @@ export function FriendsScreen() {
   const refreshing =
     tab === "friends"
       ? friends.isFetching
-      : incoming.isFetching || outgoing.isFetching;
+      : tab === "suggestions"
+        ? suggestions.isFetching
+        : incoming.isFetching || outgoing.isFetching;
 
   return (
     <div className="flex h-dvh flex-col">
@@ -77,7 +95,7 @@ export function FriendsScreen() {
       <div className="px-5 pb-3">
         <div
           role="tablist"
-          aria-label="Friends and requests"
+          aria-label="Friends, suggestions, and requests"
           className="inline-flex rounded-lg border border-border p-0.5"
         >
           <TabButton
@@ -85,6 +103,24 @@ export function FriendsScreen() {
             onClick={() => setTab("friends")}
           >
             Friends
+          </TabButton>
+          <TabButton
+            active={tab === "suggestions"}
+            onClick={() => setTab("suggestions")}
+          >
+            Suggestions
+            {suggestionCount > 0 && (
+              <span
+                className={cn(
+                  "ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold",
+                  tab === "suggestions"
+                    ? "bg-primary-foreground/20 text-primary-foreground"
+                    : "bg-primary text-primary-foreground",
+                )}
+              >
+                {suggestionCount}
+              </span>
+            )}
           </TabButton>
           <TabButton
             active={tab === "requests"}
@@ -123,6 +159,8 @@ export function FriendsScreen() {
       <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto px-3 pb-4">
         {tab === "friends" ? (
           <FriendsTab query={friends} hasSearch={search.trim().length > 0} />
+        ) : tab === "suggestions" ? (
+          <SuggestionsTab query={suggestions} />
         ) : (
           <RequestsTab incoming={incoming} outgoing={outgoing} />
         )}
@@ -200,7 +238,7 @@ function FriendsTab({
   }
 
   return (
-    <>
+    <section>
       <SectionLabel icon={<Users className="size-3.5" />}>
         {friends.length} {friends.length === 1 ? "friend" : "friends"}
       </SectionLabel>
@@ -209,7 +247,69 @@ function FriendsTab({
           <FriendItem key={f.id} friend={f} />
         ))}
       </ul>
-    </>
+    </section>
+  );
+}
+
+function SuggestionsTab({
+  query,
+}: {
+  query: ReturnType<typeof useFriendSuggestions>;
+}) {
+  if (query.isPending) {
+    return (
+      <section>
+        <SectionLabel icon={<Sparkles className="size-3.5" />}>
+          Suggested for you
+        </SectionLabel>
+        <div className="flex items-center gap-2 rounded-xl px-3 py-4 text-sm text-muted-foreground">
+          <Spinner className="size-4" />
+          Finding people who match your tags…
+        </div>
+      </section>
+    );
+  }
+
+  if (query.isError) {
+    return (
+      <section>
+        <SectionLabel icon={<Sparkles className="size-3.5" />}>
+          Suggested for you
+        </SectionLabel>
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-card/70 px-3 py-3 text-sm">
+          <p className="text-muted-foreground">
+            We couldn&apos;t load suggestions right now.
+          </p>
+          <Button variant="outline" size="sm" onClick={() => void query.refetch()}>
+            Try again
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  const suggestions = query.data ?? [];
+  if (suggestions.length === 0) {
+    return (
+      <Centered
+        icon={<Sparkles className="size-6" />}
+        title="No suggestions yet"
+        body="We’ll show people here when their profile tags overlap with yours."
+      />
+    );
+  }
+
+  return (
+    <section>
+      <SectionLabel icon={<Sparkles className="size-3.5" />}>
+        Suggested for you · {suggestions.length}
+      </SectionLabel>
+      <ul className="space-y-3">
+        {suggestions.map((suggestion) => (
+          <FriendSuggestionItem key={suggestion.id} suggestion={suggestion} />
+        ))}
+      </ul>
+    </section>
   );
 }
 

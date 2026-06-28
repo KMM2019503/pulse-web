@@ -162,6 +162,33 @@ export interface FriendsResponse {
   nextCursor?: string | null;
 }
 
+export interface FriendSuggestion {
+  id: string;
+  userName: string;
+  email: string;
+  userUniqueID?: string;
+  profilePictureUrl?: string | null;
+  lastActiveAt?: string | null;
+  story: string | null;
+  summary: string | null;
+  tags: Array<{
+    slug: string;
+    label: string;
+    category: ProfileTagCategory;
+  }>;
+  sharedTags: Array<{
+    slug: string;
+    label: string;
+    category: ProfileTagCategory;
+  }>;
+  sharedTagCount: number;
+}
+
+export interface FriendSuggestionsResponse {
+  success: boolean;
+  suggestions: FriendSuggestion[];
+}
+
 export interface FriendRequestsResponse {
   success: boolean;
   requests: FriendRequest[];
@@ -221,7 +248,52 @@ export interface OwnProfile {
   updatedAt: string;
 }
 
+/**
+ * Response for `GET /profile/me` and every profile mutation
+ * (`PUT /profile/me`, `POST /profile/story`, `PUT /profile/tags`,
+ * `POST /profile/skip`). `profile` is `null` until a persona exists.
+ */
 export interface ProfileResponse {
   success: boolean;
+  user: User;
   profile: OwnProfile | null;
+}
+
+/** Body accepted by the unified `PUT /profile/me` endpoint. */
+export interface UpdateProfileInput {
+  userName?: string;
+  email?: string;
+  /** `null` clears the avatar. */
+  profilePictureUrl?: string | null;
+  /** `null` clears the gender. */
+  gender?: Gender | null;
+  /** ISO or `YYYY-MM-DD` date string. */
+  dateOfBirth?: string | null;
+  /** 10–4000 chars; re-parses the persona story. */
+  story?: string;
+  /** 1–30 lowercase kebab-case slugs; confirms the persona tags. */
+  tags?: string[];
+}
+
+/** Public account fields exposed by `GET /profile/:userId`. */
+export interface PublicProfileUser {
+  id: string;
+  userName: string;
+  userUniqueID?: string;
+  profilePictureUrl?: string | null;
+  lastActiveAt?: string | null;
+}
+
+/** Public persona fields exposed by `GET /profile/:userId` (READY only). */
+export interface PublicProfile {
+  userId: string;
+  summary: string | null;
+  tags: ProfileTag[];
+  updatedAt: string;
+}
+
+export interface PublicProfileResponse {
+  success: boolean;
+  user: PublicProfileUser;
+  profile: PublicProfile;
 }

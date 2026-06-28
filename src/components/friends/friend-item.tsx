@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MessageCircle, UserMinus } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
@@ -39,7 +40,12 @@ export function FriendItem({ friend }: { friend: Friend }) {
         online={onlineUserIds.has(friend.id)}
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium">{friend.userName}</p>
+        <Link
+          href={`/profile/${friend.id}`}
+          className="block truncate font-medium hover:underline focus-visible:underline focus-visible:outline-none"
+        >
+          {friend.userName}
+        </Link>
         <p className="truncate text-xs text-muted-foreground">
           {friend.userUniqueID ? `${friend.userUniqueID} · ` : ""}
           {friend.email}

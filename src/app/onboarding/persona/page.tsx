@@ -6,9 +6,12 @@ import {
   AlertCircle,
   ArrowRight,
   Check,
+  Clock,
   RefreshCw,
+  ShieldCheck,
   Sparkles,
   WandSparkles,
+  Zap,
 } from "lucide-react";
 import { BrandWordmark } from "@/components/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -158,15 +161,24 @@ export default function PersonaOnboardingPage() {
     );
   }
 
+  const storyLength = story.trim().length;
+  const storyValid = storyLength >= MIN_STORY_LENGTH;
+  const storyProgress = Math.min(storyLength / MAX_STORY_LENGTH, 1);
+  const currentStep: 1 | 2 = isReviewStep ? 2 : 1;
+
   return (
     <div className="relative min-h-dvh overflow-hidden bg-background">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,rgba(107,76,230,0.18),transparent_60%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-96 bg-[radial-gradient(circle_at_top,rgba(107,76,230,0.16),transparent_62%)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[-10rem] top-28 size-80 rounded-full bg-primary/10 blur-3xl"
+        className="pointer-events-none absolute right-[-12rem] top-24 size-96 rounded-full bg-primary/10 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-[-10rem] left-[-8rem] size-80 rounded-full bg-primary/5 blur-3xl"
       />
 
       <div className="relative mx-auto flex min-h-dvh max-w-6xl flex-col px-6 py-6">
@@ -176,11 +188,14 @@ export default function PersonaOnboardingPage() {
         </header>
 
         <main className="mx-auto flex w-full max-w-5xl flex-1 items-center py-10">
-          <div className="grid w-full gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid w-full items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <section className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-primary uppercase">
-                <Sparkles className="size-3.5" />
-                Optional onboarding
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-primary uppercase">
+                  <Sparkles className="size-3.5" />
+                  Optional onboarding
+                </div>
+                <StepIndicator current={currentStep} />
               </div>
 
               <div className="space-y-3">
@@ -196,21 +211,24 @@ export default function PersonaOnboardingPage() {
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <InfoTile
+                  icon={ShieldCheck}
                   title="Human in control"
                   body="Nothing is final until you confirm the tags."
                 />
                 <InfoTile
+                  icon={Zap}
                   title="Fast preview"
                   body="The AI summarizes your story and suggests matching tags."
                 />
                 <InfoTile
+                  icon={Clock}
                   title="Skip anytime"
                   body="You can continue to chat now and return later."
                 />
               </div>
 
-              <div className="rounded-3xl border border-border/70 bg-card/85 p-5 shadow-sm backdrop-blur">
-                <div className="mb-3 flex items-center justify-between">
+              <div className="rounded-3xl border border-border/70 bg-card/85 p-5 shadow-sm backdrop-blur sm:p-6">
+                <div className="mb-3 flex items-start justify-between gap-4">
                   <div>
                     <h2 className="text-lg font-semibold">Your story</h2>
                     <p className="text-sm text-muted-foreground">
@@ -218,8 +236,15 @@ export default function PersonaOnboardingPage() {
                       interests, favorite teams, media, or lifestyle.
                     </p>
                   </div>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {story.trim().length}/{MAX_STORY_LENGTH}
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium tabular-nums transition-colors",
+                      storyValid
+                        ? "bg-primary/10 text-primary"
+                        : "bg-secondary text-muted-foreground",
+                    )}
+                  >
+                    {storyLength}/{MAX_STORY_LENGTH}
                   </span>
                 </div>
 
@@ -230,10 +255,27 @@ export default function PersonaOnboardingPage() {
                   }
                   placeholder="I build web apps, love football, stay up too late watching horror movies, and I’m the friend who always says yes to weekend trips."
                   className={cn(
-                    "min-h-48 w-full resize-y rounded-2xl border border-input bg-background px-4 py-3 text-sm shadow-sm transition-colors",
+                    "min-h-48 w-full resize-y rounded-2xl border border-input bg-background px-4 py-3 text-sm leading-6 shadow-sm transition-colors",
                     "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-ring",
                   )}
                 />
+
+                <div className="mt-2 flex items-center gap-3">
+                  <div className="h-1 flex-1 overflow-hidden rounded-full bg-secondary">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-all duration-300",
+                        storyValid ? "bg-primary" : "bg-muted-foreground/40",
+                      )}
+                      style={{ width: `${Math.max(storyProgress * 100, storyLength ? 4 : 0)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {storyValid
+                      ? "Looks good — ready to analyze"
+                      : `At least ${MIN_STORY_LENGTH} characters`}
+                  </span>
+                </div>
 
                 {isFailed && (
                   <div className="mt-3 rounded-2xl border border-destructive/20 bg-destructive/8 px-4 py-3 text-sm text-destructive">
@@ -261,8 +303,9 @@ export default function PersonaOnboardingPage() {
                 )}
 
                 {error && (
-                  <div className="mt-3 rounded-2xl border border-destructive/20 bg-destructive/8 px-4 py-3 text-sm text-destructive">
-                    {error}
+                  <div className="mt-3 flex items-start gap-2 rounded-2xl border border-destructive/20 bg-destructive/8 px-4 py-3 text-sm text-destructive">
+                    <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                    <span>{error}</span>
                   </div>
                 )}
 
@@ -296,16 +339,17 @@ export default function PersonaOnboardingPage() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-border/70 bg-card/85 p-6 shadow-sm backdrop-blur">
-              <div className="mb-5 flex items-center justify-between">
+            <section className="flex flex-col rounded-[2rem] border border-border/70 bg-card/85 p-6 shadow-sm backdrop-blur lg:sticky lg:top-6">
+              <div className="mb-5 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold">Tag preview</h2>
                   <p className="text-sm text-muted-foreground">
                     Review the suggestions and keep the ones that feel right.
                   </p>
                 </div>
-                {profile?.parsedAt && (
-                  <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                {isReviewStep && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                    <span className="size-1.5 rounded-full bg-primary" />
                     Ready to review
                   </span>
                 )}
@@ -325,9 +369,14 @@ export default function PersonaOnboardingPage() {
                   )}
 
                   <div>
-                    <p className="mb-3 text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
-                      Suggested tags
-                    </p>
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-xs font-semibold tracking-[0.12em] text-muted-foreground uppercase">
+                        Suggested tags
+                      </p>
+                      <span className="text-xs font-medium text-muted-foreground tabular-nums">
+                        {selectedTagSlugs.length}/{previewTags.length} kept
+                      </span>
+                    </div>
                     <div className="flex flex-wrap gap-2.5">
                       {previewTags.map((tag) => {
                         const active = selectedTagSlugs.includes(tag.slug);
@@ -340,7 +389,7 @@ export default function PersonaOnboardingPage() {
                               "group inline-flex cursor-pointer items-center gap-2 rounded-2xl border px-3 py-2 text-left transition-colors",
                               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                               active
-                                ? "border-primary bg-primary text-primary-foreground"
+                                ? "border-primary bg-primary text-primary-foreground shadow-sm"
                                 : "border-border bg-background hover:border-primary/40 hover:bg-accent",
                             )}
                           >
@@ -357,7 +406,16 @@ export default function PersonaOnboardingPage() {
                                 {tag.category.replace("-", " ")}
                               </span>
                             </span>
-                            {active && <Check className="size-4 shrink-0" />}
+                            <span
+                              className={cn(
+                                "flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors",
+                                active
+                                  ? "border-primary-foreground/60 bg-primary-foreground/15"
+                                  : "border-border text-transparent",
+                              )}
+                            >
+                              <Check className="size-3" />
+                            </span>
                           </button>
                         );
                       })}
@@ -419,28 +477,108 @@ export default function PersonaOnboardingPage() {
   );
 }
 
-function InfoTile({ title, body }: { title: string; body: string }) {
+function StepIndicator({ current }: { current: 1 | 2 }) {
+  const steps = [
+    { id: 1 as const, label: "Story" },
+    { id: 2 as const, label: "Review" },
+  ];
+
   return (
-    <div className="rounded-2xl border border-border/70 bg-card/70 p-4 shadow-sm">
+    <div className="flex items-center gap-2 text-xs font-medium">
+      {steps.map((step, index) => (
+        <React.Fragment key={step.id}>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors",
+              current === step.id ? "text-primary" : "text-muted-foreground",
+            )}
+          >
+            <span
+              className={cn(
+                "flex size-4 items-center justify-center rounded-full text-[10px] font-semibold transition-colors",
+                current >= step.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground",
+              )}
+            >
+              {current > step.id ? <Check className="size-2.5" /> : step.id}
+            </span>
+            {step.label}
+          </span>
+          {index === 0 && (
+            <span
+              aria-hidden
+              className={cn(
+                "h-px w-5 transition-colors",
+                current > step.id ? "bg-primary" : "bg-border",
+              )}
+            />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+function InfoTile({
+  icon: Icon,
+  title,
+  body,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="group rounded-2xl border border-border/70 bg-card/70 p-4 shadow-sm transition-colors hover:border-primary/30 hover:bg-card">
+      <span className="mb-2.5 inline-flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/15">
+        <Icon className="size-4" />
+      </span>
       <p className="text-sm font-semibold">{title}</p>
       <p className="mt-1 text-sm leading-6 text-muted-foreground">{body}</p>
     </div>
   );
 }
 
+const GHOST_CHIP_WIDTHS = ["5.5rem", "7rem", "4.5rem", "6.25rem", "5rem", "6.75rem"];
+
 function EmptyPreview() {
   return (
-    <div className="flex min-h-80 flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-background/60 px-6 text-center">
-      <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-        <Sparkles className="size-6" />
+    <div className="flex flex-1 flex-col rounded-3xl border border-dashed border-border/80 bg-background/50 p-5">
+      <div className="flex items-center gap-3">
+        <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Sparkles className="size-5" />
+        </span>
+        <div>
+          <h3 className="text-sm font-semibold">Your preview will show up here</h3>
+          <p className="text-xs leading-5 text-muted-foreground">
+            We’ll summarize your story and suggest tags to review.
+          </p>
+        </div>
       </div>
-      <h3 className="mt-4 text-lg font-semibold">Your preview will show up here</h3>
-      <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        Once we analyze your story, you&apos;ll be able to review the summary and
-        decide which tags should be saved to your profile.
-      </p>
-      <div className="mt-4 rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-        Optional step
+
+      <div className="mt-5 animate-pulse space-y-4" aria-hidden>
+        <div className="space-y-2 rounded-2xl bg-secondary/60 px-4 py-3.5">
+          <div className="h-2.5 w-16 rounded-full bg-muted-foreground/15" />
+          <div className="h-2 w-full rounded-full bg-muted-foreground/10" />
+          <div className="h-2 w-4/5 rounded-full bg-muted-foreground/10" />
+        </div>
+
+        <div className="flex flex-wrap gap-2.5">
+          {GHOST_CHIP_WIDTHS.map((width, index) => (
+            <div
+              key={index}
+              style={{ width }}
+              className="h-9 rounded-2xl border border-dashed border-border bg-background/60"
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-auto flex items-center justify-center pt-6">
+        <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
+          Optional step
+        </span>
       </div>
     </div>
   );

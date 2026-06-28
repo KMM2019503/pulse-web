@@ -10,11 +10,13 @@ import { api } from "@/lib/api";
 import type {
   Friend,
   FriendRequest,
+  FriendSuggestion,
   FriendshipState,
 } from "@/lib/types";
 
 /* ---- Query keys ---- */
 export const friendsKey = (q?: string) => ["friends", q ?? ""] as const;
+export const friendSuggestionsKey = ["friends", "suggestions"] as const;
 export const incomingRequestsKey = ["friend-requests", "incoming"] as const;
 export const outgoingRequestsKey = ["friend-requests", "outgoing"] as const;
 export const friendshipStatusKey = (userId: string) =>
@@ -37,6 +39,18 @@ export function useFriends(rawQuery = "") {
     queryFn: async ({ signal }) => {
       const res = await api.listFriends(q || undefined, signal);
       return res.friends ?? [];
+    },
+    staleTime: 15_000,
+  });
+}
+
+export function useFriendSuggestions(limit = 8, enabled = true) {
+  return useQuery<FriendSuggestion[]>({
+    queryKey: [...friendSuggestionsKey, limit],
+    enabled,
+    queryFn: async ({ signal }) => {
+      const res = await api.listFriendSuggestions(limit, signal);
+      return res.suggestions ?? [];
     },
     staleTime: 15_000,
   });
@@ -90,6 +104,7 @@ function useInvalidateFriends() {
     void qc.invalidateQueries({ queryKey: ["friends"] });
     void qc.invalidateQueries({ queryKey: ["friend-requests"] });
     void qc.invalidateQueries({ queryKey: ["friendship-status"] });
+    void qc.invalidateQueries({ queryKey: friendSuggestionsKey });
   }, [qc]);
 }
 
