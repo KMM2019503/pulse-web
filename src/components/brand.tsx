@@ -18,7 +18,7 @@ export function BrandWordmark({ className }: { className?: string }) {
   return (
     <span className={cn("flex items-center gap-2 font-semibold", className)}>
       <BrandMark className="size-8" />
-      <span className="text-lg tracking-tight">Yok</span>
+      <span className="text-lg tracking-tight">Pulse</span>
     </span>
   );
 }

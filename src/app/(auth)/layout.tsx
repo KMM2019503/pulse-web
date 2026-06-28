@@ -38,7 +38,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </p>
         </div>
         <p className="relative text-sm text-primary-foreground/60">
-          © {new Date().getFullYear()} Yok
+          © {new Date().getFullYear()} Pulse
         </p>
       </aside>
 

@@ -9,8 +9,8 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Yok — Messages",
-  description: "Real-time chat for Yok.",
+  title: "Pulse — Messages",
+  description: "Real-time chat for Pulse.",
 };
 
 export const viewport: Viewport = {

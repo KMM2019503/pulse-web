@@ -58,7 +58,7 @@ export default function SignupPage() {
       <div className="mb-8 space-y-1.5">
         <h2 className="text-2xl font-semibold tracking-tight">Create your account</h2>
         <p className="text-sm text-muted-foreground">
-          Join Yok and start messaging in seconds.
+          Join Pulse and start messaging in seconds.
         </p>
       </div>
 

@@ -25,7 +25,7 @@ interface AuthContextValue {
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
-const STORAGE_KEY = "yok.user";
+const STORAGE_KEY = "pulse.user";
 
 function readStoredUser(): User | null {
   if (typeof window === "undefined") return null;

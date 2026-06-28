@@ -200,7 +200,7 @@ export default function PersonaOnboardingPage() {
 
               <div className="space-y-3">
                 <h1 className="max-w-xl text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-                  Help Yok understand your vibe.
+                  Help Pulse understand your vibe.
                 </h1>
                 <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
                   Share a short story about who you are, what you enjoy, and the
