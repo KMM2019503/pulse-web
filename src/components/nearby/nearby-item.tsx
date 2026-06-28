@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { MessageCircle } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { AddFriendButton } from "@/components/friends/add-friend-button";
 import { useConversations } from "@/hooks/use-conversations";
 import type { NearbyUser } from "@/lib/types";
 
@@ -39,10 +40,13 @@ export function NearbyItem({ user }: { user: NearbyUser }) {
           {user.email}
         </p>
       </div>
-      <Button variant="outline" size="sm" onClick={message}>
-        <MessageCircle className="size-4" />
-        Message
-      </Button>
+      <div className="flex items-center gap-1.5">
+        <AddFriendButton userId={user.id} />
+        <Button variant="outline" size="sm" onClick={message}>
+          <MessageCircle className="size-4" />
+          Message
+        </Button>
+      </div>
     </li>
   );
 }

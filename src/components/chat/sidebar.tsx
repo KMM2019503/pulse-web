@@ -8,6 +8,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { ComposeIconButton } from "./compose-button";
 import { ConversationList } from "./conversation-list";
 import { NearbyNavButton } from "@/components/nearby/nearby-nav-button";
+import { FriendsNavButton } from "@/components/friends/friends-nav-button";
 import { useAuth } from "@/providers/auth-provider";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export function Sidebar({ className }: { className?: string }) {
       <header className="flex items-center justify-between px-4 py-3.5">
         <BrandWordmark />
         <div className="flex items-center gap-0.5">
+          <FriendsNavButton />
           <NearbyNavButton />
           <ComposeIconButton />
           <ThemeToggle />

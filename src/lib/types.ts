@@ -114,3 +114,70 @@ export interface IncomingNewMessagePayload {
   message: Message;
   updatedConversation?: Conversation;
 }
+
+/* ----- Friends ----- */
+
+export type FriendRequestStatus =
+  | "PENDING"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "CANCELLED";
+
+/** Relationship between the current user and another user. */
+export type FriendshipState =
+  | "SELF"
+  | "BLOCKED"
+  | "FRIENDS"
+  | "REQUEST_INCOMING"
+  | "REQUEST_OUTGOING"
+  | "NONE";
+
+/** An accepted friend, as returned by `GET /friends`. */
+export interface Friend {
+  id: string;
+  userName: string;
+  email: string;
+  userUniqueID?: string;
+  profilePictureUrl?: string | null;
+  lastActiveAt?: string | null;
+  friendshipId: string;
+  friendsSince: string;
+}
+
+/** A pending friend request. Embeds `sender` (incoming) or `receiver` (outgoing). */
+export interface FriendRequest {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  status: FriendRequestStatus;
+  createdAt: string;
+  updatedAt: string;
+  sender?: UserSearchResult;
+  receiver?: UserSearchResult;
+}
+
+export interface FriendsResponse {
+  success: boolean;
+  friends: Friend[];
+  nextCursor?: string | null;
+}
+
+export interface FriendRequestsResponse {
+  success: boolean;
+  requests: FriendRequest[];
+  nextCursor?: string | null;
+}
+
+export interface FriendshipStatusResponse {
+  success: boolean;
+  status: FriendshipState;
+  requestId?: string;
+}
+
+export interface SendFriendRequestResponse {
+  success: boolean;
+  status: "PENDING" | "FRIENDS";
+  autoAccepted?: boolean;
+  request?: FriendRequest;
+  friend?: UserSearchResult;
+}

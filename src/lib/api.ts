@@ -4,7 +4,11 @@ import type {
   Conversation,
   ConversationMessagesResponse,
   ConversationsResponse,
+  FriendRequestsResponse,
+  FriendsResponse,
+  FriendshipStatusResponse,
   Message,
+  SendFriendRequestResponse,
   UserSearchResult,
 } from "./types";
 
@@ -159,4 +163,50 @@ export const api = {
       message?: Message;
       conversation?: Conversation;
     }>("/messages/direct-message", { method: "POST", body: input }),
+
+  /* ---- Friends ---- */
+  // Accepted friends (optionally filtered by name).
+  listFriends: (q?: string, signal?: AbortSignal) =>
+    request<FriendsResponse>("/friends", { query: { q }, signal }),
+
+  listIncomingRequests: () =>
+    request<FriendRequestsResponse>("/friends/requests/incoming"),
+
+  listOutgoingRequests: () =>
+    request<FriendRequestsResponse>("/friends/requests/outgoing"),
+
+  // Send a request. May auto-accept if the recipient already invited the caller.
+  sendFriendRequest: (receiverId: string) =>
+    request<SendFriendRequestResponse>("/friends/requests", {
+      method: "POST",
+      body: { receiverId },
+    }),
+
+  acceptFriendRequest: (requestId: string) =>
+    request<{ success: boolean; status: string; friend?: UserSearchResult }>(
+      `/friends/requests/${requestId}/accept`,
+      { method: "POST" },
+    ),
+
+  rejectFriendRequest: (requestId: string) =>
+    request<{ success: boolean; status: string }>(
+      `/friends/requests/${requestId}/reject`,
+      { method: "POST" },
+    ),
+
+  // Cancel an outgoing (sent) request.
+  cancelFriendRequest: (requestId: string) =>
+    request<{ success: boolean; status: string }>(
+      `/friends/requests/${requestId}`,
+      { method: "DELETE" },
+    ),
+
+  // Relationship status with another user — drives "Add friend" button state.
+  getFriendshipStatus: (userId: string, signal?: AbortSignal) =>
+    request<FriendshipStatusResponse>(`/friends/status/${userId}`, { signal }),
+
+  unfriend: (friendId: string) =>
+    request<{ success: boolean; message: string }>(`/friends/${friendId}`, {
+      method: "DELETE",
+    }),
 };
