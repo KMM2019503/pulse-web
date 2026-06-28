@@ -1,6 +1,6 @@
-# Yok — Web Client
+# Pulse — Web
 
-Frontend for the **Yok chat** backend (`../`, the `yok_server` repo).
+Frontend for **Pulse**, a real-time chat app. Talks to the [`pulse-api`](https://github.com/KMM2019503/pulse-api) backend over REST + Socket.IO.
 
 - **Stack:** Next.js 16 (App Router) · React 19 · Tailwind 4 · TanStack Query · socket.io-client
 - **MVP scope:** auth (login / signup) + real-time direct-message chat with presence and read receipts
@@ -8,30 +8,37 @@ Frontend for the **Yok chat** backend (`../`, the `yok_server` repo).
 
 ## Prerequisites
 
-The backend must be running and reachable. By default this client targets
-`http://localhost:9999` (the backend's `PORT`). The backend's CORS + Socket.IO
-are configured for an origin of `http://localhost:3000`, so **run this app on
-port 3000**.
+The `pulse-api` backend must be running and reachable. By default this client
+targets `http://localhost:9999`. The backend's CORS + Socket.IO must allow this
+app's origin (`http://localhost:3000` in dev), so **run this app on port 3000**.
 
-```bash
-# In ../ (yok_server)
-bun run dev          # starts API + Socket.IO on :9999
-```
-
-## Run the client
+## Run locally
 
 ```bash
 bun install
-PORT=3000 bun run dev      # http://localhost:3000
+cp .env.example .env.local      # then edit if your API is elsewhere
+PORT=3000 bun run dev           # http://localhost:3000
 ```
 
-Configuration lives in `.env.local`:
+Configuration lives in `.env.local` (see [`.env.example`](.env.example)):
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:9999
 # Only if the backend sets V2_INTERNAL_TOKEN:
 # NEXT_PUBLIC_V2_INTERNAL_TOKEN=
 ```
+
+## Deploy (Vercel)
+
+Zero-config. Import this repo into Vercel and set environment variables:
+
+| Variable | Value |
+| --- | --- |
+| `NEXT_PUBLIC_API_URL` | Public URL of the deployed `pulse-api` (e.g. `https://api.yourdomain.com`) |
+| `NEXT_PUBLIC_V2_INTERNAL_TOKEN` | Only if the backend sets `V2_INTERNAL_TOKEN` |
+
+The backend must list this app's deployed origin in its `CORS_ORIGIN`, and
+auth cookies require both to be served over HTTPS in production.
 
 ## How it talks to the backend
 
