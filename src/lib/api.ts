@@ -8,6 +8,7 @@ import type {
   FriendsResponse,
   FriendshipStatusResponse,
   Message,
+  ProfileResponse,
   SendFriendRequestResponse,
   UserSearchResult,
 } from "./types";
@@ -208,5 +209,25 @@ export const api = {
   unfriend: (friendId: string) =>
     request<{ success: boolean; message: string }>(`/friends/${friendId}`, {
       method: "DELETE",
+    }),
+
+  /* ---- Persona profile ---- */
+  getMyProfile: () => request<ProfileResponse>("/profile/me"),
+
+  submitProfileStory: (story: string) =>
+    request<ProfileResponse>("/profile/story", {
+      method: "POST",
+      body: { story },
+    }),
+
+  confirmProfileTags: (tags: string[]) =>
+    request<ProfileResponse>("/profile/tags", {
+      method: "PUT",
+      body: { tags },
+    }),
+
+  skipProfile: () =>
+    request<ProfileResponse>("/profile/skip", {
+      method: "POST",
     }),
 };

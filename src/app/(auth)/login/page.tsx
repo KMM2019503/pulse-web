@@ -23,7 +23,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login(email.trim(), password);
-      router.replace("/chat");
+      router.replace("/");
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : "Something went wrong. Try again.",

@@ -181,3 +181,47 @@ export interface SendFriendRequestResponse {
   request?: FriendRequest;
   friend?: UserSearchResult;
 }
+
+/* ----- Persona profiles ----- */
+
+export type ProfileStatus =
+  | "PENDING"
+  | "SKIPPED"
+  | "AWAITING_REVIEW"
+  | "READY"
+  | "FAILED";
+
+export type ProfileTagCategory =
+  | "profession"
+  | "sport"
+  | "fandom"
+  | "personality"
+  | "media"
+  | "lifestyle"
+  | "values";
+
+export interface ProfileTag {
+  slug: string;
+  label: string;
+  category: ProfileTagCategory;
+  confidence: number;
+}
+
+export interface OwnProfile {
+  userId: string;
+  story: string | null;
+  summary: string | null;
+  status: ProfileStatus;
+  tags: ProfileTag[];
+  confirmedTagSlugs: string[];
+  aiTagSlugs: string[];
+  suggestedTags: string[];
+  parsedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProfileResponse {
+  success: boolean;
+  profile: OwnProfile | null;
+}

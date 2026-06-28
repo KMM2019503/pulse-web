@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { profileNeedsOnboarding, useMyProfile } from "@/hooks/use-profile";
 import { useAuth } from "@/providers/auth-provider";
 import { useRealtime } from "@/hooks/use-realtime";
 import { Sidebar } from "@/components/chat/sidebar";
@@ -14,16 +15,25 @@ export default function FriendsLayout({
 }) {
   const { status, user } = useAuth();
   const router = useRouter();
+  const profile = useMyProfile(status === "authenticated");
+  const redirectToOnboarding =
+    status === "authenticated" &&
+    profile.isSuccess &&
+    profileNeedsOnboarding(profile.data);
 
   // Client-side guard: bounce unauthenticated users to login.
   React.useEffect(() => {
     if (status === "unauthenticated") router.replace("/login");
-  }, [status, router]);
+    else if (redirectToOnboarding) router.replace("/onboarding/persona");
+  }, [status, redirectToOnboarding, router]);
 
   // Keep the conversation cache live so the sidebar + "Message" actions work.
   useRealtime(user?.id);
 
-  if (status !== "authenticated") {
+  const waitingOnProfile =
+    status === "authenticated" && !profile.isError && !profile.isSuccess;
+
+  if (status !== "authenticated" || waitingOnProfile || redirectToOnboarding) {
     return (
       <div className="flex h-dvh items-center justify-center">
         <Spinner className="size-6" />

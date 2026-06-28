@@ -44,7 +44,7 @@ export default function SignupPage() {
         passwords: form.passwords,
         gender: form.gender,
       });
-      router.replace("/chat");
+      router.replace("/onboarding/persona");
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : "Something went wrong. Try again.",

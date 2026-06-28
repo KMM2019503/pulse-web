@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
   // Already signed in? Bounce to the app.
   React.useEffect(() => {
-    if (status === "authenticated") router.replace("/chat");
+    if (status === "authenticated") router.replace("/");
   }, [status, router]);
 
   return (

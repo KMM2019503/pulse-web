@@ -3,8 +3,35 @@
 Frontend for **Pulse**, a real-time chat app. Talks to the [`pulse-api`](https://github.com/KMM2019503/pulse-api) backend over REST + Socket.IO.
 
 - **Stack:** Next.js 16 (App Router) · React 19 · Tailwind 4 · TanStack Query · socket.io-client
-- **MVP scope:** auth (login / signup) + real-time direct-message chat with presence and read receipts
+- **MVP scope:** auth (login / signup) + persona onboarding + real-time direct-message chat with presence and read receipts
 - **Design:** clean & modern, full light/dark via `next-themes`
+
+## Current implementation status
+
+### Integrated now
+
+- Auth flow is implemented for login and signup.
+- Persona onboarding is integrated after signup and before the main app when needed.
+- Onboarding supports:
+  - free-text story submission
+  - AI preview review
+  - tag confirmation
+  - explicit skip
+- Root routing checks the current backend profile state and sends the user to:
+  - `/onboarding/persona` when profile status is not yet complete
+  - `/chat` when profile status is `READY` or `SKIPPED`
+- Chat, friends, and nearby app shells now guard against bypassing onboarding.
+- Frontend profile integration uses the backend routes:
+  - `GET /v2/profile/me`
+  - `POST /v2/profile/story`
+  - `PUT /v2/profile/tags`
+  - `POST /v2/profile/skip`
+
+### Not integrated yet
+
+- Friend suggestions driven by confirmed persona tags.
+- Channel suggestions / channel tagging.
+- Full manual browser QA against live Gemini responses across the complete onboarding flow.
 
 ## Prerequisites
 
@@ -57,11 +84,12 @@ auth cookies require both to be served over HTTPS in production.
 src/
   app/
     (auth)/            login + signup (branded split-screen)
+    onboarding/        persona onboarding flow (story, preview, confirm, skip)
     (app)/chat/        guarded chat shell, empty state, [conversationId] thread
   components/
     ui/                button, input, avatar, spinner, skeleton
     chat/              sidebar, conversation list/item, header, message list/bubble, composer
-  hooks/               use-conversations, use-messages, use-send-message, use-realtime
+  hooks/               use-conversations, use-messages, use-profile, use-send-message, use-realtime
   lib/                 api (fetch), socket, types, chat-utils, env
   providers/           query-provider, auth-provider
 ```
@@ -77,6 +105,6 @@ bunx eslint src        # lint
 
 ## Not yet built (next milestones)
 
-Channels, groups, friends/contacts, profile settings, starting a brand-new
-conversation (find-user-by-phone), and message attachments. The backend already
-exposes endpoints for most of these under `/v2`.
+Channels, groups, friend suggestions, channel suggestions, profile settings,
+starting a brand-new conversation (find-user-by-phone), and message attachments.
+The backend already exposes endpoints for many of these under `/v2`.
